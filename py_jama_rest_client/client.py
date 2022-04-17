@@ -131,7 +131,7 @@ class JamaClient:
         Returns: A list of versioned items belonging to the baseline
         """
         resource_path = 'baselines/' + str(baseline_id) + '/versioneditems'
-        baseline_items = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        baseline_items = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return baseline_items
 
     def get_projects(self, allowed_results_per_page=__allowed_results_per_page):
@@ -139,7 +139,7 @@ class JamaClient:
         :return: JSON Array of Item Objects.
         """
         resource_path = 'projects'
-        project_data = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        project_data = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return project_data
 
     def get_filter_results(self, filter_id, project_id=None, allowed_results_per_page=__allowed_results_per_page):
@@ -249,7 +249,7 @@ class JamaClient:
 
         """
         resource_path = 'items/' + str(item_id) + '/tags'
-        item_tags = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        item_tags = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return item_tags
 
     def get_attachment(self, attachment_id):
@@ -324,7 +324,7 @@ class JamaClient:
 
         """
         resource_path = 'relationshiptypes/'
-        item_types = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        item_types = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return item_types
 
     def get_relationship_type(self, relationship_type_id):
@@ -357,7 +357,7 @@ class JamaClient:
 
         """
         resource_path = 'itemtypes/'
-        item_types = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        item_types = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return item_types
 
     def get_item_type(self, item_type_id):
@@ -392,7 +392,7 @@ class JamaClient:
 
         """
         resource_path = 'items/' + str(item_id) + '/synceditems'
-        synced_items = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        synced_items = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return synced_items
 
     def get_items_synceditems_status(self, item_id, synced_item_id):
@@ -477,7 +477,7 @@ class JamaClient:
         Returns: JSON array with all versions for the item
         """
         resource_path = 'items/' + str(item_id) + '/versions'
-        versions = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        versions = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return versions
 
     def get_item_version(self, item_id, version_num):
@@ -521,7 +521,7 @@ class JamaClient:
 
         """
         resource_path = 'picklists/'
-        pick_lists = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        pick_lists = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return pick_lists
 
     def get_pick_list(self, pick_list_id):
@@ -554,7 +554,7 @@ class JamaClient:
 
         """
         resource_path = 'picklists/' + str(pick_list_id) + '/options'
-        pick_list_options = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        pick_list_options = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return pick_list_options
 
     def get_pick_list_option(self, pick_list_option_id):
@@ -743,7 +743,6 @@ class JamaClient:
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
-
     def get_item_children(self, item_id, allowed_results_per_page=__allowed_results_per_page):
         """
         This method will return list of the child items of the item passed to the function.
@@ -754,14 +753,14 @@ class JamaClient:
         Returns: a List of Objects that represent the children of the item passed in.
         """
         resource_path = 'items/' + str(item_id) + '/children'
-        child_items = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        child_items = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return child_items
 
     def get_testruns(self, test_cycle_id, allowed_results_per_page=__allowed_results_per_page):
         """This method will return all test runs associated with the specified test cycle.  Test runs will be returned
         as a list of json objects."""
         resource_path = 'testcycles/' + str(test_cycle_id) + '/testruns'
-        testrun_data = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        testrun_data = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return testrun_data
 
     def get_items_upstream_relationships(self, item_id, allowed_results_per_page=__allowed_results_per_page):
@@ -775,7 +774,7 @@ class JamaClient:
 
         """
         resource_path = 'items/' + str(item_id) + '/upstreamrelationships'
-        return self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        return self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
 
     def get_items_downstream_related(self, item_id, allowed_results_per_page=__allowed_results_per_page):
         """
@@ -789,7 +788,7 @@ class JamaClient:
 
         """
         resource_path = 'items/' + str(item_id) + '/downstreamrelated'
-        return self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        return self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
 
     def get_items_downstream_relationships(self, item_id, allowed_results_per_page=__allowed_results_per_page):
         """
@@ -874,7 +873,7 @@ class JamaClient:
 
         """
         resource_path = 'users/'
-        users = self.__get_all(resource_path,  allowed_results_per_page=allowed_results_per_page)
+        users = self.__get_all(resource_path, allowed_results_per_page=allowed_results_per_page)
         return users
 
     def get_user(self, user_id):
@@ -928,6 +927,16 @@ class JamaClient:
             raise APIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
+
+    def get_test_cycles(self, testplan_id, allowed_results_per_page=__allowed_results_per_page):
+        """ This method will return all cycles in the give testplan.
+        :param testplan_id (int) The integer testplan ID.
+        :return a json list of cycles
+        """
+        resource_path = f'testplans/{testplan_id}/testcycles'
+        params = {}
+        cycles = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
+        return cycles
 
     def delete_item(self, item_id):
         """
@@ -1064,7 +1073,7 @@ class JamaClient:
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
-    def get_testplans(self,project_id, allowed_results_per_page=__allowed_results_per_page):
+    def get_testplans(self, project_id, allowed_results_per_page=__allowed_results_per_page):
         """ This method will return all testplans in the give project.
         :param project_id (int) The integer project ID.
         :return a json list of testplans
@@ -1074,7 +1083,7 @@ class JamaClient:
         testplans = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
         return testplans
 
-    def get_testgroups(self,testplan_id, allowed_results_per_page=__allowed_results_per_page):
+    def get_testgroups(self, testplan_id, allowed_results_per_page=__allowed_results_per_page):
         """ This method will return all testgroups in the give testplan.
         :param testplan_id (int) The integer testplan ID.
         :return a json list of testgroups
@@ -1084,7 +1093,7 @@ class JamaClient:
         testgroups = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
         return testgroups
 
-    def get_testgroup_testcases(self,testplan_id, testgroup_id, allowed_results_per_page=__allowed_results_per_page):
+    def get_testgroup_testcases(self, testplan_id, testgroup_id, allowed_results_per_page=__allowed_results_per_page):
         """ This method will return all testcases in the give testgroup.
         :param testplan_id (int) The integer testplan ID.
         :param testgroup_id (int) The integer testgroup ID.
@@ -1407,7 +1416,7 @@ class JamaClient:
         resource_path = 'testruns/' + str(test_run_id)
         headers = {'content-type': 'application/json'}
         try:
-            response = self.__core.put(resource_path, data=data, headers=headers)
+            response = self.__core.put(resource_path, data=json.dumps(data), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
             raise APIException(str(err))
@@ -1439,7 +1448,8 @@ class JamaClient:
 
         return data
 
-    def __get_page(self, resource, start_at, params=None,  allowed_results_per_page=__allowed_results_per_page,  **kwargs):
+    def __get_page(self, resource, start_at, params=None, allowed_results_per_page=__allowed_results_per_page,
+                   **kwargs):
         """This method will return one page of results from the specified resource type.
         Pass any needed parameters along
         The response object will be returned"""
