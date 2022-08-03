@@ -1,10 +1,50 @@
 import json
 import logging
 
+from typing import Dict
+
+from custom.config import jama_config
+from execution_manager.data_models import JamaListModel
 from .core import Core, CoreException
 
 # This is the py_jama_rest_client logger.
 py_jama_rest_client_logger = logging.getLogger('py_jama_rest_client')
+
+
+class JamaQueryParamNameConstants:
+    ITEMS_PER_PAGE = 'maxResults'
+    OFFSET = 'startAt'
+    PROJECT_ID = 'project'
+    CONTAINS = 'contains'
+    INCLUDE = 'include'
+    DATA = 'data'
+    LINKED = 'linked'
+
+
+class JamaParams:
+    @staticmethod
+    def get_project_query_param(project_id: int) -> Dict[str, int]:
+        return {JamaQueryParamNameConstants.PROJECT_ID: project_id}
+
+    @staticmethod
+    def get_jama_linked_data_params():
+        return {
+            JamaQueryParamNameConstants.INCLUDE: [
+                JamaQueryTestCaseParamValueConstatns.AUTOMATION_FRAMEWORK,
+                JamaQueryTestCaseParamValueConstatns.REQUIRED_REGIONS,
+                JamaQueryTestCaseParamValueConstatns.PRE_REQUIREMENTS,
+                JamaQueryTestCaseParamValueConstatns.POST_REQUIREMENTS,
+                JamaQueryTestCaseParamValueConstatns.SCANNER_TYPE,
+            ]
+        }
+
+
+class JamaQueryTestCaseParamValueConstatns:
+    AUTOMATION_FRAMEWORK = 'data.fields.automation_framework$143'
+    REQUIRED_REGIONS = 'data.fields.required_regions$143'
+    PRE_REQUIREMENTS = 'data.fields.prerequirements$143'
+    POST_REQUIREMENTS = 'data.fields.post_requirements$143'
+    SCANNER_TYPE = 'data.fields.system$143'
 
 
 class APIException(Exception):
@@ -1100,9 +1140,9 @@ class JamaClient:
         :return a json list of testcases in the give testgroup
         """
         resource_path = f"testplans/{testplan_id}/testgroups/{testgroup_id}/testcases"
-        params = {}
-        testcases = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
-        return testcases
+        params = JamaParams.get_jama_linked_data_params()
+        output = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
+        return output.get(JamaQueryParamNameConstants.DATA), output.get(JamaQueryParamNameConstants.LINKED)
 
     def post_testplans_testcycles(self, testplan_id, testcycle_name, start_date, end_date, testgroups_to_include=None,
                                   testrun_status_to_include=None):
@@ -1435,18 +1475,26 @@ class JamaClient:
         total_results = float("inf")
 
         data = []
+        linked_data = {}
 
         while len(data) < total_results:
             page_response = self.__get_page(resource, start_index, params=params, **kwargs)
             page_json = page_response.json()
+            all_data = JamaListModel.parse_obj(page_json)
 
-            page_info = page_json['meta']['pageInfo']
-            start_index = page_info['startIndex'] + allowed_results_per_page
-            total_results = page_info.get('totalResults')
-            page_data = page_json.get('data')
+            if all_data.linked is not None:
+                linked_data.update(all_data.linked.objects)
+
+            page_info = all_data.meta.page_info
+            start_index = page_info.start_index + allowed_results_per_page
+            total_results = page_info.total_results
+            page_data = all_data.data
             data.extend(page_data)
 
-        return data
+        if params and JamaQueryParamNameConstants.INCLUDE in params.keys():
+            return {JamaQueryParamNameConstants.DATA: data, JamaQueryParamNameConstants.LINKED: linked_data}
+        else:
+            return data
 
     def __get_page(self, resource, start_at, params=None, allowed_results_per_page=__allowed_results_per_page,
                    **kwargs):
@@ -1543,3 +1591,6 @@ class JamaClient:
 
     def get_allowed_results_per_page(self):
         return self.__allowed_results_per_page
+
+
+jama_client = JamaClient(host_domain=jama_config.URL, credentials=(jama_config.USER, jama_config.PASSWORD))
