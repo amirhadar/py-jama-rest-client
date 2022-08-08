@@ -1,50 +1,13 @@
 import json
 import logging
 
-from typing import Dict
-
 from custom.config import jama_config
 from execution_manager.data_models import JamaListModel
+from .constants import JamaParams, JamaQueryParamNameConstants
 from .core import Core, CoreException
 
 # This is the py_jama_rest_client logger.
 py_jama_rest_client_logger = logging.getLogger('py_jama_rest_client')
-
-
-class JamaQueryParamNameConstants:
-    ITEMS_PER_PAGE = 'maxResults'
-    OFFSET = 'startAt'
-    PROJECT_ID = 'project'
-    CONTAINS = 'contains'
-    INCLUDE = 'include'
-    DATA = 'data'
-    LINKED = 'linked'
-
-
-class JamaParams:
-    @staticmethod
-    def get_project_query_param(project_id: int) -> Dict[str, int]:
-        return {JamaQueryParamNameConstants.PROJECT_ID: project_id}
-
-    @staticmethod
-    def get_jama_linked_data_params():
-        return {
-            JamaQueryParamNameConstants.INCLUDE: [
-                JamaQueryTestCaseParamValueConstatns.AUTOMATION_FRAMEWORK,
-                JamaQueryTestCaseParamValueConstatns.REQUIRED_REGIONS,
-                JamaQueryTestCaseParamValueConstatns.PRE_REQUIREMENTS,
-                JamaQueryTestCaseParamValueConstatns.POST_REQUIREMENTS,
-                JamaQueryTestCaseParamValueConstatns.SCANNER_TYPE,
-            ]
-        }
-
-
-class JamaQueryTestCaseParamValueConstatns:
-    AUTOMATION_FRAMEWORK = 'data.fields.automation_framework$143'
-    REQUIRED_REGIONS = 'data.fields.required_regions$143'
-    PRE_REQUIREMENTS = 'data.fields.prerequirements$143'
-    POST_REQUIREMENTS = 'data.fields.post_requirements$143'
-    SCANNER_TYPE = 'data.fields.system$143'
 
 
 class APIException(Exception):
