@@ -56,7 +56,7 @@ class JamaClient:
 
     def __init__(self, host_domain,
                  credentials=('username|clientID', 'password|clientSecret'),
-                 api_version='/rest/v1/',
+                 api_version='rest/v1/',
                  oauth=False,
                  verify=True,
                  allowed_results_per_page=20):
@@ -1556,4 +1556,6 @@ class JamaClient:
         return self.__allowed_results_per_page
 
 
-jama_client = JamaClient(host_domain=jama_config.URL, credentials=(jama_config.USER, jama_config.PASSWORD))
+jama_client = JamaClient(host_domain=jama_config.URL,
+                         credentials=(jama_config.USER, jama_config.PASSWORD),
+                         api_version=jama_config.REST_ADDRESS)
