@@ -1,6 +1,9 @@
 import json
 import logging
 
+from custom.config import jama_config
+from execution_manager.data_models import JamaListModel
+from .constants import JamaParams, JamaQueryParamNameConstants
 from .core import Core, CoreException
 
 # This is the py_jama_rest_client logger.
@@ -53,7 +56,7 @@ class JamaClient:
 
     def __init__(self, host_domain,
                  credentials=('username|clientID', 'password|clientSecret'),
-                 api_version='/rest/v1/',
+                 api_version='rest/v1/',
                  oauth=False,
                  verify=True,
                  allowed_results_per_page=20):
@@ -1100,9 +1103,9 @@ class JamaClient:
         :return a json list of testcases in the give testgroup
         """
         resource_path = f"testplans/{testplan_id}/testgroups/{testgroup_id}/testcases"
-        params = {}
-        testcases = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
-        return testcases
+        params = JamaParams.get_jama_linked_data_params()
+        output = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
+        return output.get(JamaQueryParamNameConstants.DATA), output.get(JamaQueryParamNameConstants.LINKED)
 
     def post_testplans_testcycles(self, testplan_id, testcycle_name, start_date, end_date, testgroups_to_include=None,
                                   testrun_status_to_include=None):
@@ -1435,18 +1438,26 @@ class JamaClient:
         total_results = float("inf")
 
         data = []
+        linked_data = {}
 
         while len(data) < total_results:
             page_response = self.__get_page(resource, start_index, params=params, **kwargs)
             page_json = page_response.json()
+            all_data = JamaListModel.parse_obj(page_json)
 
-            page_info = page_json['meta']['pageInfo']
-            start_index = page_info['startIndex'] + allowed_results_per_page
-            total_results = page_info.get('totalResults')
-            page_data = page_json.get('data')
+            if all_data.linked is not None:
+                linked_data.update(all_data.linked.objects)
+
+            page_info = all_data.meta.page_info
+            start_index = page_info.start_index + allowed_results_per_page
+            total_results = page_info.total_results
+            page_data = all_data.data
             data.extend(page_data)
 
-        return data
+        if params and JamaQueryParamNameConstants.INCLUDE in params.keys():
+            return {JamaQueryParamNameConstants.DATA: data, JamaQueryParamNameConstants.LINKED: linked_data}
+        else:
+            return data
 
     def __get_page(self, resource, start_at, params=None, allowed_results_per_page=__allowed_results_per_page,
                    **kwargs):
@@ -1543,3 +1554,8 @@ class JamaClient:
 
     def get_allowed_results_per_page(self):
         return self.__allowed_results_per_page
+
+
+jama_client = JamaClient(host_domain=jama_config.URL,
+                         credentials=(jama_config.USER, jama_config.PASSWORD),
+                         api_version=jama_config.REST_ADDRESS)
