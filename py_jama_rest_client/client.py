@@ -1153,6 +1153,25 @@ class JamaClient:
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
+    def delete_testplans_testcycles(self, cycle_id):
+        """
+         This method will delete a Test Cycle.
+
+        Args:
+            cycle_id (int): The Cycle_ID of the test cycle to delete.
+
+        Returns: The success status code.
+        """
+        resource_path = 'testcycles/' + str(cycle_id)
+        try:
+            response = self.__core.delete(resource_path)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+        JamaClient.__handle_response_status(response)
+        return response.status_code
+
+
     def post_item(self, project, item_type_id, child_item_type_id, location, fields, global_id=None):
         """ This method will post a new item to Jama Connect.
         :param global_id: optional param to post the item with a custom global id
