@@ -3,48 +3,48 @@ import logging
 
 from custom.config import jama_config
 from execution_manager.data_models import JamaListModel
-from .constants import JamaParams, JamaQueryParamNameConstants
+from .constants import JamaParams, JamaQueryParamNameConstants, JAMA_EXCEPTION_MESSAGE
 from .core import Core, CoreException
 
 # This is the py_jama_rest_client logger.
 py_jama_rest_client_logger = logging.getLogger('py_jama_rest_client')
 
 
-class APIException(Exception):
+class JamaAPIException(Exception):
     """This is the base class for all exceptions raised by the JamaClient"""
 
     def __init__(self, message, status_code=None, reason=None):
-        super(APIException, self).__init__(message)
+        super(JamaAPIException, self).__init__(f'{message} {JAMA_EXCEPTION_MESSAGE}')
         self.status_code = status_code
         self.reason = reason
 
 
-class UnauthorizedException(APIException):
+class UnauthorizedException(JamaAPIException):
     """This exception is thrown whenever the api returns a 401 unauthorized response."""
     pass
 
 
-class TooManyRequestsException(APIException):
+class TooManyRequestsException(JamaAPIException):
     """This exception is thrown whenever the api returns a 429 too many requests response."""
     pass
 
 
-class ResourceNotFoundException(APIException):
+class ResourceNotFoundException(JamaAPIException):
     """This exception is raised whenever the api returns a 404 not found response."""
     pass
 
 
-class AlreadyExistsException(APIException):
+class AlreadyExistsException(JamaAPIException):
     """This exception is thrown when the API returns a 400 response with a message that the resource already exists."""
     pass
 
 
-class APIClientException(APIException):
+class APIClientException(JamaAPIException):
     """This exception is thrown whenever a unknown 400 error is encountered."""
     pass
 
 
-class APIServerException(APIException):
+class APIServerException(JamaAPIException):
     """This exception is thrown whenever an unknown 500 response is encountered."""
     pass
 
@@ -72,7 +72,7 @@ class JamaClient:
             self.__core = Core(host_domain, credentials, api_version=api_version, oauth=oauth, verify=verify)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
 
         # Log client creation
         py_jama_rest_client_logger.info('Created a new JamaClient instance. Domain: {} '
@@ -89,7 +89,7 @@ class JamaClient:
             response = self.__core.get('')
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -121,7 +121,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -194,7 +194,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -213,7 +213,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -237,7 +237,7 @@ class JamaClient:
             response = self.__core.put(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return self.__handle_response_status(response)
 
     def get_item_tags(self, item_id, allowed_results_per_page=__allowed_results_per_page):
@@ -269,7 +269,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -345,7 +345,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -378,7 +378,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -414,7 +414,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -446,7 +446,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -465,7 +465,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -542,7 +542,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -574,7 +574,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -610,7 +610,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -691,7 +691,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -723,7 +723,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -742,7 +742,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -894,7 +894,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return response.json()['data']
 
     def get_current_user(self):
@@ -909,7 +909,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return response.json()['data']
 
     def get_test_cycle(self, test_cycle_id):
@@ -927,7 +927,7 @@ class JamaClient:
             response = self.__core.get(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['data']
 
@@ -955,7 +955,7 @@ class JamaClient:
             response = self.__core.delete(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
 
@@ -974,7 +974,7 @@ class JamaClient:
             response = self.__core.delete(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
 
@@ -1006,7 +1006,7 @@ class JamaClient:
             response = self.__core.patch(resource_path, data=data, headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
 
         # validate response
         JamaClient.__handle_response_status(response)
@@ -1049,7 +1049,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1072,7 +1072,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1147,7 +1147,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
 
         # Validate response
         JamaClient.__handle_response_status(response)
@@ -1185,7 +1185,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers, params=params)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1208,7 +1208,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
 
@@ -1232,7 +1232,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1259,7 +1259,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1277,7 +1277,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
 
@@ -1302,7 +1302,7 @@ class JamaClient:
             response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.json()['meta']['id']
 
@@ -1332,7 +1332,7 @@ class JamaClient:
             response = self.__core.put(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return self.__handle_response_status(response)
 
     def put_attachments_file(self, attachment_id, file_path):
@@ -1349,7 +1349,7 @@ class JamaClient:
                 response = self.__core.put(resource_path, files=files)
             except CoreException as err:
                 py_jama_rest_client_logger.error(err)
-                raise APIException(str(err))
+                raise JamaAPIException(str(err))
         self.__handle_response_status(response)
         return response.status_code
 
@@ -1388,8 +1388,8 @@ class JamaClient:
             response = self.__core.put(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
-            raise APIException
+            raise JamaAPIException(str(err))
+            raise JamaAPIException
         return self.__handle_response_status(response)
 
     def put_user_active(self, user_id, is_active):
@@ -1411,7 +1411,7 @@ class JamaClient:
             response = self.__core.put(resource_path, data=json.dumps(body), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return self.__handle_response_status(response)
 
     def put_test_run(self, test_run_id, data=None):
@@ -1422,7 +1422,7 @@ class JamaClient:
             response = self.__core.put(resource_path, data=json.dumps(data), headers=headers)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         return self.__handle_response_status(response)
 
     def __get_all(self, resource, params=None, allowed_results_per_page=__allowed_results_per_page, **kwargs):
@@ -1477,7 +1477,7 @@ class JamaClient:
             response = self.__core.get(resource, params=parameters, **kwargs)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response
 
@@ -1545,9 +1545,9 @@ class JamaClient:
 
         # Catch anything unexpected
         py_jama_rest_client_logger.error('{} error. {}'.format(status, response.reason))
-        raise APIException("{} error".format(status),
-                           status_code=status,
-                           reason=response.reason)
+        raise JamaAPIException("{} error".format(status),
+                               status_code=status,
+                               reason=response.reason)
 
     def set_allowed_results_per_page(self, allowed_results_per_page):
         self.__allowed_results_per_page = allowed_results_per_page

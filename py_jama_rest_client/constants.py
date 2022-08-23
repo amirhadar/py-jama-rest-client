@@ -41,3 +41,6 @@ class JamaParams:
                 JamaQueryTestCaseParamValueConstatns.SCANNER_TYPE,
             ]
         }
+
+
+JAMA_EXCEPTION_MESSAGE = "service: JamaClient"
