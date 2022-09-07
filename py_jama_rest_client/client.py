@@ -1444,6 +1444,17 @@ class JamaClient:
             raise JamaAPIException(str(err))
         return self.__handle_response_status(response)
 
+    def get_test_run(self, test_run_id):
+        """ This method will post a test run to Jama through the API"""
+        resource_path = 'testruns/' + str(test_run_id)
+        try:
+            response = self.__core.get(resource_path)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise JamaAPIException(str(err))
+        self.__handle_response_status(response)
+        return response.json()['data']
+
     def __get_all(self, resource, params=None, allowed_results_per_page=__allowed_results_per_page, **kwargs):
         """This method will get all of the resources specified by the resource parameter, if an id or some other
         parameter is required for the resource, include it in the params parameter.
