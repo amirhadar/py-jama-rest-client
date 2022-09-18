@@ -1,8 +1,6 @@
 import json
 import logging
 
-from custom.config import jama_config
-from execution_manager.data_models import JamaListModel
 from .constants import JamaParams, JamaQueryParamNameConstants, JAMA_EXCEPTION_MESSAGE
 from .core import Core, CoreException
 
@@ -55,6 +53,7 @@ class JamaClient:
     __allowed_results_per_page = 20  # Default is 20, Max is 50. if set to greater than 50, only 50 will items return.
 
     def __init__(self, host_domain,
+                 jama_list_model=None,
                  credentials=('username|clientID', 'password|clientSecret'),
                  api_version='rest/v1/',
                  oauth=False,
@@ -68,6 +67,7 @@ class JamaClient:
         :param verify: Defaults to True, Setting this to False will skip SSL Certificate verification"""
         self.__credentials = credentials
         self.__allowed_results_per_page = allowed_results_per_page
+        self.jama_list_model = jama_list_model
         try:
             self.__core = Core(host_domain, credentials, api_version=api_version, oauth=oauth, verify=verify)
         except CoreException as err:
@@ -1167,7 +1167,7 @@ class JamaClient:
             response = self.__core.delete(resource_path)
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
-            raise APIException(str(err))
+            raise JamaAPIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
 
@@ -1408,7 +1408,6 @@ class JamaClient:
         except CoreException as err:
             py_jama_rest_client_logger.error(err)
             raise JamaAPIException(str(err))
-            raise JamaAPIException
         return self.__handle_response_status(response)
 
     def put_user_active(self, user_id, is_active):
@@ -1473,15 +1472,23 @@ class JamaClient:
         while len(data) < total_results:
             page_response = self.__get_page(resource, start_index, params=params, **kwargs)
             page_json = page_response.json()
-            all_data = JamaListModel.parse_obj(page_json)
 
-            if all_data.linked is not None:
-                linked_data.update(all_data.linked.objects)
+            if self.jama_list_model:
+                all_data = self.jama_list_model.parse_obj(page_json)
 
-            page_info = all_data.meta.page_info
-            start_index = page_info.start_index + allowed_results_per_page
-            total_results = page_info.total_results
-            page_data = all_data.data
+                if all_data.linked is not None:
+                    linked_data.update(all_data.linked.objects)
+
+                page_info = all_data.meta.page_info
+                start_index = page_info.start_index + allowed_results_per_page
+                total_results = page_info.total_results
+                page_data = all_data.data
+            else:
+                page_info = page_json['meta']['pageInfo']
+                start_index = page_info['startIndex'] + allowed_results_per_page
+                total_results = page_info.get('totalResults')
+                page_data = page_json.get('data')
+
             data.extend(page_data)
 
         if params and JamaQueryParamNameConstants.INCLUDE in params.keys():
@@ -1584,8 +1591,3 @@ class JamaClient:
 
     def get_allowed_results_per_page(self):
         return self.__allowed_results_per_page
-
-
-jama_client = JamaClient(host_domain=jama_config.URL,
-                         credentials=(jama_config.USER, jama_config.PASSWORD),
-                         api_version=jama_config.REST_ADDRESS)
